@@ -9,22 +9,32 @@ const recipes = [
   { img: '🍰', tag: 'Dessert', title: 'Classic Tiramisu', time: '30 min', servings: '6 servings' },
 ];
 
-const RecipeGrid = () => {
+const RecipeGrid = ({ recipes, onDelete }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {recipes.map((recipe, idx) => (
         <div 
-          key={idx} 
-          className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group"
+          key={recipe._id || idx} 
+          className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative"
         >
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(recipe._id);
+            }}
+            className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm text-rust w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rust hover:text-white z-10"
+          >
+            ✕
+          </button>
+          
           <div className="h-40 bg-gradient-to-br from-gold-light to-[#E8D4A0] flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-500">
-            {recipe.img}
+            {recipe.image || '🥘'}
           </div>
           <div className="p-5">
             <span className="inline-block bg-green-light text-green text-[10px] font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
               {recipe.tag}
             </span>
-            <h3 className="font-bold text-dark mb-2">{recipe.title}</h3>
+            <h3 className="font-bold text-dark mb-2 line-clamp-1">{recipe.title}</h3>
             <div className="flex items-center gap-4 text-xs text-muted font-medium">
               <span className="flex items-center gap-1">⏱ {recipe.time}</span>
               <span className="flex items-center gap-1">👤 {recipe.servings}</span>

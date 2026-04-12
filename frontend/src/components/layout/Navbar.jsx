@@ -1,17 +1,16 @@
 import React from 'react';
 
-const Navbar = ({ onNavigate, currentPage }) => {
-  const isAuthPage = ['login', 'signup', 'dashboard'].includes(currentPage);
-
-  if (isAuthPage && currentPage !== 'dashboard') return null;
+const Navbar = ({ onNavigate, currentPage, user }) => {
+  const isAuthPage = ['login', 'signup'].includes(currentPage);
+  if (isAuthPage) return null;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 py-4 md:px-12 bg-cream/90 backdrop-blur-xl border-b border-border">
       <div 
-        className="font-serif text-2xl font-black text-dark flex items-center gap-2 cursor-pointer"
+        className="font-serif text-2xl font-black text-dark flex items-center gap-2 cursor-pointer group"
         onClick={() => onNavigate('home')}
       >
-        <span className="w-2.5 h-2.5 bg-gold rounded-full inline-block"></span>
+        <span className="w-2.5 h-2.5 bg-gold rounded-full inline-block group-hover:scale-125 transition-transform"></span>
         ChefAI
       </div>
       
@@ -19,24 +18,51 @@ const Navbar = ({ onNavigate, currentPage }) => {
         <a href="#how" className="text-muted text-sm font-medium hover:text-dark transition-colors">How it Works</a>
         <a href="#features" className="text-muted text-sm font-medium hover:text-dark transition-colors">Features</a>
         <a href="#pricing" className="text-muted text-sm font-medium hover:text-dark transition-colors">Pricing</a>
-        <a href="#about" className="text-muted text-sm font-medium hover:text-dark transition-colors">About</a>
-        <button 
-          onClick={() => onNavigate('login')}
-          className="text-dark text-sm font-medium cursor-pointer"
-        >
-          Log in
-        </button>
-        <button 
-          onClick={() => onNavigate('signup')}
-          className="bg-dark text-cream px-5 py-2 rounded-full text-sm font-medium hover:bg-olive transition-all cursor-pointer"
-        >
-          Get Started Free
-        </button>
+        
+        {user ? (
+          <div className="flex items-center gap-6 pl-4 border-l border-border">
+            <span 
+              onClick={() => onNavigate('dashboard')}
+              className={`text-sm font-bold cursor-pointer transition-colors ${currentPage === 'dashboard' ? 'text-gold' : 'text-dark hover:text-gold'}`}
+            >
+              My Kitchen
+            </span>
+            <div 
+              onClick={() => onNavigate('dashboard')}
+              className="w-10 h-10 rounded-full bg-olive text-cream flex items-center justify-center font-bold text-sm border-2 border-white shadow-sm cursor-pointer hover:scale-105 transition-transform"
+            >
+              {user.name.charAt(0)}
+            </div>
+          </div>
+        ) : (
+          <>
+            <button 
+              onClick={() => onNavigate('login')}
+              className="text-dark text-sm font-bold cursor-pointer hover:text-gold transition-colors"
+            >
+              Log in
+            </button>
+            <button 
+              onClick={() => onNavigate('signup')}
+              className="bg-dark text-cream px-6 py-2.5 rounded-full text-sm font-bold hover:bg-olive transition-all transform active:scale-95 cursor-pointer shadow-lg shadow-dark/10"
+            >
+              Get Started
+            </button>
+          </>
+        )}
       </div>
 
-      {/* Mobile Menu Toggle (simplified for now) */}
       <div className="md:hidden">
-         <button onClick={() => onNavigate('signup')} className="bg-dark text-cream px-4 py-1.5 rounded-full text-xs font-medium">Get Started</button>
+         {user ? (
+           <div 
+            onClick={() => onNavigate('dashboard')}
+            className="w-8 h-8 rounded-full bg-olive text-cream flex items-center justify-center font-bold text-xs cursor-pointer"
+           >
+             {user.name.charAt(0)}
+           </div>
+         ) : (
+           <button onClick={() => onNavigate('signup')} className="bg-dark text-cream px-4 py-1.5 rounded-full text-xs font-bold">Get Started</button>
+         )}
       </div>
     </nav>
   );

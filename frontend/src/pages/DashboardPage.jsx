@@ -1,8 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/dashboard/Sidebar';
 import RecipeGrid from '../components/dashboard/RecipeGrid';
+import { recipeService } from '../services/api';
 
-const DashboardPage = ({ onOpenChat, onLogout }) => {
+const DashboardPage = ({ user, onOpenChat, onLogout }) => {
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [prompt, setPrompt] = useState('');
+  const [generating, setGenerating] = useState(false);
+
+  useEffect(() => {
+    fetchRecipes();
+  }, []);
+
+  const fetchRecipes = async () => {
+    try {
+      setLoading(true);
+      const data = await recipeService.getRecipes();
+      setRecipes(data);
+    } catch (err) {
+      console.error('Failed to fetch recipes:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!prompt.trim()) return;
+    setGenerating(true);
+    try {
+      const generated = await recipeService.generateRecipe(prompt);
+      // Auto-save the generated recipe for this demo
+      const saved = await recipeService.saveRecipe(generated);
+      setRecipes(prev => [saved, ...prev]);
+      setPrompt('');
+      alert('Recipe generated and saved!');
+    } catch (err) {
+      console.error('Generation failed:', err);
+      alert('Failed to generate recipe. Check your API key.');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this recipe?')) {
+      try {
+        await recipeService.deleteRecipe(id);
+        setRecipes(prev => prev.filter(r => r._id !== id));
+      } catch (err) {
+        console.error('Delete failed:', err);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F2EDE3] pt-0">
       <nav className="bg-white border-b border-border px-6 py-4 flex items-center justify-between sticky top-0 z-50">
@@ -10,8 +61,10 @@ const DashboardPage = ({ onOpenChat, onLogout }) => {
           <span className="text-gold">✦</span> ChefAI
         </div>
         <div className="flex items-center gap-4">
-          <span className="hidden md:inline text-sm text-muted">Good morning, Chef!</span>
-          <div className="w-10 h-10 rounded-full bg-olive text-cream flex items-center justify-center font-bold text-sm">GR</div>
+          <span className="hidden md:inline text-sm text-muted">Good morning, {user?.name || 'Chef'}!</span>
+          <div className="w-10 h-10 rounded-full bg-olive text-cream flex items-center justify-center font-bold text-sm">
+            {user?.name?.charAt(0) || 'C'}
+          </div>
           <button 
             onClick={onLogout}
             className="md:hidden bg-cream border border-border px-3 py-1.5 rounded-lg text-xs font-bold"
@@ -29,27 +82,31 @@ const DashboardPage = ({ onOpenChat, onLogout }) => {
         <main className="flex-1 p-6 md:p-10 overflow-y-auto">
           <div className="mb-10">
             <h2 className="font-serif text-3xl font-bold text-dark mb-1">Your Recipe Dashboard</h2>
-            <p className="text-muted text-sm">You've generated 24 recipes this month · 6 remaining on Free plan</p>
+            <p className="text-muted text-sm">You've generated {recipes.length} recipes total</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
             <div className="bg-white border border-border rounded-2xl p-6 shadow-sm group hover:border-gold transition-colors">
-              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gold transition-colors">24</div>
+              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gold transition-colors">{recipes.length}</div>
               <div className="text-xs font-bold text-muted uppercase tracking-wider">Recipes Generated</div>
             </div>
             <div className="bg-white border border-border rounded-2xl p-6 shadow-sm group hover:border-gold transition-colors">
-              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gold transition-colors">7</div>
+              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gold transition-colors">
+                {recipes.filter(r => r.favorite).length || 0}
+              </div>
               <div className="text-xs font-bold text-muted uppercase tracking-wider">Saved Favourites</div>
             </div>
             <div className="bg-white border border-border rounded-2xl p-6 shadow-sm group hover:border-gold transition-colors">
-              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gold transition-colors">12</div>
-              <div className="text-xs font-bold text-muted uppercase tracking-wider">AI Chats</div>
+              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gold transition-colors">---</div>
+              <div className="text-xs font-bold text-muted uppercase tracking-wider">AI Credits</div>
             </div>
           </div>
 
           <div className="bg-white border border-border rounded-2xl p-6 mb-10 shadow-sm flex flex-col md:flex-row items-center gap-4">
             <input 
               type="text" 
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe a dish, ingredient, or cuisine... e.g. 'Quick pasta with chicken and spinach'"
               className="flex-1 bg-cream border-1.5 border-border rounded-xl px-4 py-3 text-sm focus:border-gold outline-none transition-colors w-full"
             />
@@ -61,20 +118,45 @@ const DashboardPage = ({ onOpenChat, onLogout }) => {
                 <span>💬</span> Ask AI Chef
               </button>
               <button 
-                 onClick={onOpenChat}
-                 className="flex-1 md:flex-none bg-gold text-dark px-6 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-gold-light transition-colors cursor-pointer whitespace-nowrap"
+                 onClick={handleGenerate}
+                 disabled={generating || !prompt.trim()}
+                 className={`flex-1 md:flex-none bg-gold text-dark px-6 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-gold-light transition-colors cursor-pointer whitespace-nowrap ${generating ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <span>✨</span> Generate
+                <span>✨</span> {generating ? 'Generating...' : 'Generate'}
               </button>
             </div>
           </div>
 
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-dark">Recent Recipes</h3>
-            <button className="text-xs font-bold text-muted hover:text-dark transition-colors cursor-pointer">View all →</button>
+            <h3 className="font-bold text-dark text-lg">My Collection</h3>
+            <button 
+              onClick={fetchRecipes}
+              className="text-xs font-bold text-muted hover:text-dark transition-colors cursor-pointer uppercase tracking-wider"
+            >
+              Refresh ↻
+            </button>
           </div>
 
-          <RecipeGrid />
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-muted text-sm font-medium">Fetching your kitchen...</p>
+            </div>
+          ) : recipes.length > 0 ? (
+            <RecipeGrid recipes={recipes} onDelete={handleDelete} />
+          ) : (
+            <div className="bg-white/50 border-2 border-dashed border-border rounded-3xl p-20 text-center">
+              <div className="text-5xl mb-6 opacity-30">🍳</div>
+              <h4 className="text-dark font-bold mb-2">No recipes yet</h4>
+              <p className="text-muted text-sm mb-8">Enter a prompt above to generate your first AI dish!</p>
+              <button 
+                onClick={() => setPrompt('Simple chicken curry')}
+                className="text-gold font-bold text-sm underline cursor-pointer"
+              >
+                Try a suggestion
+              </button>
+            </div>
+          )}
         </main>
       </div>
 
@@ -83,7 +165,7 @@ const DashboardPage = ({ onOpenChat, onLogout }) => {
         className="fixed bottom-6 right-6 bg-dark text-cream px-6 py-4 rounded-full font-bold shadow-2xl flex items-center gap-3 hover:translate-y-[-4px] transition-all cursor-pointer z-40 group"
       >
         <span className="text-xl group-hover:rotate-12 transition-transform">🍳</span>
-        <span>Chat with AI Chef</span>
+        <span className="hidden sm:inline">Chat with AI Chef</span>
       </button>
     </div>
   );
