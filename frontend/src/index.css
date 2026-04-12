@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #FDFAF4;
+  --color-dark: #1A1208;
+  --color-olive: #4A5240;
+  --color-gold: #C8922A;
+  --color-gold-light: #F5DFA0;
+  --color-rust: #B85C2A;
+  --color-card: #FFFEF9;
+  --color-border: #E8E0CC;
+  --color-muted: #7A6E5A;
+  --color-green: #2D5A27;
+  --color-green-light: #EBF4E8;
+
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "DM Sans", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-cream text-dark font-sans min-h-screen;
+  }
+}
