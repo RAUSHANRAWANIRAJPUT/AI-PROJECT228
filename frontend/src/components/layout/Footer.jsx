@@ -11,7 +11,7 @@ const Footer = ({ onNavigate }) => {
               onClick={() => onNavigate('home')}
             >
               <span className="w-2.5 h-2.5 bg-gold rounded-full inline-block"></span>
-              ChefAI
+              Let Me Cook
             </div>
             <p className="text-gray-400 text-sm leading-relaxed max-w-[280px]">
               Your AI-powered kitchen companion. Generate recipes, learn techniques, and cook with confidence — powered by OpenRouter.
@@ -50,7 +50,7 @@ const Footer = ({ onNavigate }) => {
         </div>
         
         <div className="pt-8 border-t border-gray-800 flex flex-col md:row items-center justify-between gap-4 text-center md:text-left">
-          <p className="text-gray-600 text-xs">© 2026 ChefAI. All rights reserved.</p>
+          <p className="text-gray-600 text-xs">© 2026 Let Me Cook. All rights reserved.</p>
           <p className="text-gray-600 text-xs">Built with OpenRouter AI · Designed with love</p>
         </div>
       </div>

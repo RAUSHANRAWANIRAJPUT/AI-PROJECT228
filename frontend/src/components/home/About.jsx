@@ -5,19 +5,19 @@ const About = ({ onNavigate }) => {
     <section id="about" className="py-24 px-6 md:px-12 bg-cream">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div>
-          <span className="text-gold text-xs font-semibold uppercase tracking-widest mb-3 block">About ChefAI</span>
+          <span className="text-gold text-xs font-semibold uppercase tracking-widest mb-3 block">About Let Me Cook</span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-dark mb-6 leading-tight">Built for food lovers, by food lovers</h2>
           <p className="text-muted text-lg leading-relaxed mb-6">
-            ChefAI was born from a simple idea: cooking should be joyful, not stressful. We combine the power of large language models via OpenRouter with a clean, intuitive interface to make recipe discovery effortless for everyone.
+            Let Me Cook was born from a simple idea: cooking should be joyful, not stressful. We combine the power of large language models via OpenRouter with a clean, intuitive interface to make recipe discovery effortless for everyone.
           </p>
           <p className="text-muted text-lg leading-relaxed mb-10">
-            Whether you're a beginner trying your first dish or a seasoned cook exploring new cuisines, ChefAI is your personal kitchen companion.
+            Whether you're a beginner trying your first dish or a seasoned cook exploring new cuisines, Let Me Cook is your personal kitchen companion.
           </p>
           <button 
             onClick={() => onNavigate('signup')}
             className="bg-dark text-cream px-8 py-4 rounded-full text-lg font-medium hover:bg-olive transition-all transform hover:-translate-y-0.5 cursor-pointer inline-flex items-center gap-2 group shadow-lg"
           >
-            Join ChefAI <span className="group-hover:translate-x-1 transition-transform">→</span>
+            Join Let Me Cook <span className="group-hover:translate-x-1 transition-transform">→</span>
           </button>
         </div>
         

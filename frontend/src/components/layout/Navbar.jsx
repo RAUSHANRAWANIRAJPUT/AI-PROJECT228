@@ -5,13 +5,13 @@ const Navbar = ({ onNavigate, currentPage, user }) => {
   if (isAuthPage) return null;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 py-4 md:px-12 bg-cream/90 backdrop-blur-xl border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-6 py-4 md:px-12 glass border-none">
       <div 
         className="font-serif text-2xl font-black text-dark flex items-center gap-2 cursor-pointer group"
         onClick={() => onNavigate('home')}
       >
         <span className="w-2.5 h-2.5 bg-gold rounded-full inline-block group-hover:scale-125 transition-transform"></span>
-        ChefAI
+        Let Me Cook
       </div>
       
       <div className="hidden md:flex items-center gap-8">

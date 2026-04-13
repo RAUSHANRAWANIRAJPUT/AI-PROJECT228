@@ -37,7 +37,11 @@ const DashboardPage = ({ user, onOpenChat, onLogout }) => {
       alert('Recipe generated and saved!');
     } catch (err) {
       console.error('Generation failed:', err);
-      alert('Failed to generate recipe. Check your API key.');
+      let message = err.response?.data?.message || err.message || 'Failed to generate recipe. Check your API key.';
+      if (typeof message === 'object') {
+        message = JSON.stringify(message);
+      }
+      alert(message);
     } finally {
       setGenerating(false);
     }
@@ -56,9 +60,9 @@ const DashboardPage = ({ user, onOpenChat, onLogout }) => {
 
   return (
     <div className="min-h-screen bg-[#F2EDE3] pt-0">
-      <nav className="bg-white border-b border-border px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+      <nav className="glass bg-white/60 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
         <div className="font-serif text-xl font-black flex items-center gap-2">
-          <span className="text-gold">✦</span> ChefAI
+          <span className="text-gold animate-pulse">✦</span> Let Me Cook
         </div>
         <div className="flex items-center gap-4">
           <span className="hidden md:inline text-sm text-muted">Good morning, {user?.name || 'Chef'}!</span>
@@ -86,23 +90,23 @@ const DashboardPage = ({ user, onOpenChat, onLogout }) => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm group hover:border-gold transition-colors">
-              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gold transition-colors">{recipes.length}</div>
+            <div className="glass rounded-2xl p-6 shadow-sm group hover:border-gold transition-all transform hover:-translate-y-1">
+              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gradient-gold transition-colors">{recipes.length}</div>
               <div className="text-xs font-bold text-muted uppercase tracking-wider">Recipes Generated</div>
             </div>
-            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm group hover:border-gold transition-colors">
-              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gold transition-colors">
+            <div className="glass rounded-2xl p-6 shadow-sm group hover:border-gold transition-all transform hover:-translate-y-1">
+              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gradient-gold transition-colors">
                 {recipes.filter(r => r.favorite).length || 0}
               </div>
               <div className="text-xs font-bold text-muted uppercase tracking-wider">Saved Favourites</div>
             </div>
-            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm group hover:border-gold transition-colors">
-              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gold transition-colors">---</div>
+            <div className="glass rounded-2xl p-6 shadow-sm group hover:border-gold transition-all transform hover:-translate-y-1">
+              <div className="font-serif text-3xl font-bold text-dark mb-1 group-hover:text-gradient-gold transition-colors">---</div>
               <div className="text-xs font-bold text-muted uppercase tracking-wider">AI Credits</div>
             </div>
           </div>
 
-          <div className="bg-white border border-border rounded-2xl p-6 mb-10 shadow-sm flex flex-col md:flex-row items-center gap-4">
+          <div className="glass rounded-2xl p-6 mb-10 shadow-sm flex flex-col md:flex-row items-center gap-4 hover:shadow-md transition-shadow">
             <input 
               type="text" 
               value={prompt}
@@ -142,20 +146,37 @@ const DashboardPage = ({ user, onOpenChat, onLogout }) => {
               <div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
               <p className="text-muted text-sm font-medium">Fetching your kitchen...</p>
             </div>
-          ) : recipes.length > 0 ? (
-            <RecipeGrid recipes={recipes} onDelete={handleDelete} />
           ) : (
-            <div className="bg-white/50 border-2 border-dashed border-border rounded-3xl p-20 text-center">
-              <div className="text-5xl mb-6 opacity-30">🍳</div>
-              <h4 className="text-dark font-bold mb-2">No recipes yet</h4>
-              <p className="text-muted text-sm mb-8">Enter a prompt above to generate your first AI dish!</p>
-              <button 
-                onClick={() => setPrompt('Simple chicken curry')}
-                className="text-gold font-bold text-sm underline cursor-pointer"
-              >
-                Try a suggestion
-              </button>
-            </div>
+            <>
+              {generating && (
+                <div className="mb-6 glass rounded-2xl p-6 shadow-sm animate-pulse-soft border-gold/50">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-gray-200/60 rounded-xl animate-pulse"></div>
+                    <div className="flex-1">
+                       <div className="h-5 bg-gray-200/60 rounded w-1/3 mb-2 animate-pulse"></div>
+                       <div className="h-3 bg-gray-200/60 rounded w-1/4 animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="h-3 bg-gray-200/60 rounded w-full mb-2 animate-pulse"></div>
+                  <div className="h-3 bg-gray-200/60 rounded w-5/6 animate-pulse"></div>
+                </div>
+              )}
+              {recipes.length > 0 ? (
+                <RecipeGrid recipes={recipes} onDelete={handleDelete} />
+              ) : (
+                <div className="glass border-2 border-dashed border-border rounded-3xl p-20 text-center">
+                  <div className="text-5xl mb-6 opacity-30 animate-bounce-slow">🍳</div>
+                  <h4 className="text-dark font-bold mb-2">No recipes yet</h4>
+                  <p className="text-muted text-sm mb-8">Enter a prompt above to generate your first AI dish!</p>
+                  <button 
+                    onClick={() => setPrompt('Simple chicken curry')}
+                    className="text-gold font-bold text-sm hover:underline cursor-pointer"
+                  >
+                    Try a suggestion
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </main>
       </div>

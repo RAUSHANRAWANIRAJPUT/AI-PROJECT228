@@ -2,19 +2,19 @@ import React from 'react';
 
 const testimonials = [
   {
-    quote: '"ChefAI transformed my weeknight cooking. I just type what\'s in my fridge and get a full recipe in seconds. The chatbot even helped me fix my curry when it was too spicy!"',
+    quote: '"Let Me Cook transformed my weeknight cooking. I just type what\'s in my fridge and get a full recipe in seconds. The chatbot even helped me fix my curry when it was too spicy!"',
     author: 'Priya Sharma',
     role: 'Home Cook · Mumbai',
     avatar: 'PS'
   },
   {
-    quote: '"As a culinary student, I use ChefAI to explore recipes I haven\'t tried before. The step-by-step instructions are incredibly detailed and professional."',
+    quote: '"As a culinary student, I use Let Me Cook to explore recipes I haven\'t tried before. The step-by-step instructions are incredibly detailed and professional."',
     author: 'James Moreno',
     role: 'Culinary Student · NYC',
     avatar: 'JM'
   },
   {
-    quote: '"The dietary filter feature is a lifesaver. I\'m gluten-free and ChefAI always remembers to give me safe alternatives without me having to ask twice."',
+    quote: '"The dietary filter feature is a lifesaver. I\'m gluten-free and Let Me Cook always remembers to give me safe alternatives without me having to ask twice."',
     author: 'Aisha Khan',
     role: 'Food Blogger · London',
     avatar: 'AK'

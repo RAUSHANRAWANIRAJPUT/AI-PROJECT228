@@ -4,7 +4,7 @@ const steps = [
   {
     num: '01',
     title: 'Describe your craving',
-    description: 'Type any dish name, ingredients you have, or a cuisine style. ChefAI understands natural language.'
+    description: 'Type any dish name, ingredients you have, or a cuisine style. Let Me Cook understands natural language.'
   },
   {
     num: '02',

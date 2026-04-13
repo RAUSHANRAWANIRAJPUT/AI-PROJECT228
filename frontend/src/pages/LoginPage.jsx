@@ -28,7 +28,7 @@ const LoginPage = ({ onNavigate, onLoginSuccess }) => {
           className="font-serif text-xl font-black mb-1 flex items-center gap-2 cursor-pointer"
           onClick={() => onNavigate('home')}
         >
-          <span className="text-gold">✦</span> ChefAI
+          <span className="text-gold">✦</span> Let Me Cook
         </div>
         <h2 className="font-serif text-3xl font-bold mt-6 mb-2">Welcome back</h2>
         <p className="text-muted text-sm mb-8">Log in to access your recipes and AI chef</p>

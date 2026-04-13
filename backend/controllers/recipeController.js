@@ -12,10 +12,16 @@ const generateRecipe = async (req, res) => {
     }
 
     try {
+        if (!process.env.OPENROUTER_API_KEY) {
+            return res.status(500).json({ message: 'OpenRouter API key is not configured' });
+        }
+
         const response = await axios.post(
             'https://openrouter.ai/api/v1/chat/completions',
             {
-                model: 'google/gemini-2.0-flash-exp:free', // Use a standard model
+                model: 'openai/gpt-4o-mini',
+                temperature: 0.7,
+                max_tokens: 900,
                 messages: [
                     {
                         role: 'system',
@@ -26,22 +32,68 @@ const generateRecipe = async (req, res) => {
                         content: prompt
                     }
                 ],
-                response_format: { type: 'json_object' }
+                response_format: {
+                    type: 'json_schema',
+                    json_schema: {
+                        name: 'recipe',
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                title: { type: 'string' },
+                                tag: { type: 'string' },
+                                time: { type: 'string' },
+                                servings: { type: 'string' },
+                                ingredients: { type: 'array', items: { type: 'string' } },
+                                instructions: { type: 'array', items: { type: 'string' } }
+                            },
+                            required: ['title', 'tag', 'time', 'servings', 'ingredients', 'instructions']
+                        }
+                    }
+                }
             },
             {
                 headers: {
                     'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                    'HTTP-Referer': 'https://chefai.app',
-                    'X-Title': 'ChefAI'
+                    'Content-Type': 'application/json',
+                    'Referer': 'https://letmecook.app',
+                    'X-Title': 'Let Me Cook'
                 }
             }
         );
 
-        const recipeData = JSON.parse(response.data.choices[0].message.content);
+        const choice = response.data?.choices?.[0];
+        const content = choice?.message?.content;
+        if (!content) {
+            console.error('AI Generation Error: missing content', response.data);
+            return res.status(500).json({ message: 'AI service returned an empty response' });
+        }
+
+        let recipeData = content;
+        if (typeof content === 'string') {
+            try {
+                recipeData = JSON.parse(content);
+            } catch (parseError) {
+                console.error('AI Generation Parse Error:', parseError, 'rawContent:', content);
+                return res.status(500).json({ message: 'AI service returned invalid recipe format' });
+            }
+        }
+
         res.status(200).json(recipeData);
     } catch (error) {
-        console.error('AI Generation Error:', error.response?.data || error.message);
-        res.status(500).json({ message: 'Failed to generate recipe with AI' });
+        const apiError = error.response?.data || error.message;
+        console.error('AI Generation Error:', apiError);
+
+        let message = error.response?.data?.message ||
+            error.response?.data?.error ||
+            error.response?.data?.detail ||
+            error.message ||
+            'Failed to generate recipe with AI';
+
+        if (typeof message === 'object') {
+            message = JSON.stringify(message);
+        }
+
+        res.status(error.response?.status || 500).json({ message });
     }
 };
 

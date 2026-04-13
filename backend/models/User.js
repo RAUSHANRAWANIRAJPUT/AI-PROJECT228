@@ -11,7 +11,7 @@ const userSchema = mongoose.Schema({
         required: [true, 'Please add an email'],
         unique: true,
         match: [
-            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
             'Please add a valid email'
         ]
     },
@@ -30,7 +30,7 @@ const userSchema = mongoose.Schema({
 // Encrypt password using bcrypt
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
-        next();
+        return next();
     }
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);

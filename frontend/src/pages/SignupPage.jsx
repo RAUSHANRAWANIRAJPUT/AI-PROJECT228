@@ -16,7 +16,11 @@ const SignupPage = ({ onNavigate, onLoginSuccess }) => {
       const data = await authService.signup({ name, email, password });
       onLoginSuccess(data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed. Please try again.');
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        'Signup failed. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
@@ -29,7 +33,7 @@ const SignupPage = ({ onNavigate, onLoginSuccess }) => {
           className="font-serif text-xl font-black mb-1 flex items-center gap-2 cursor-pointer"
           onClick={() => onNavigate('home')}
         >
-          <span className="text-gold">✦</span> ChefAI
+          <span className="text-gold">✦</span> Let Me Cook
         </div>
         <h2 className="font-serif text-3xl font-bold mt-6 mb-2">Create your account</h2>
         <p className="text-muted text-sm mb-8">Start generating recipes for free — no card needed</p>
