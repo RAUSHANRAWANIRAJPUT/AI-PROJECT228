@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import RotatingShayari from '../components/shared/RotatingShayari';
 
 const LandingPage = ({ onNavigate }) => {
   const [visibleSections, setVisibleSections] = useState({});
@@ -55,6 +56,10 @@ const LandingPage = ({ onNavigate }) => {
             <p className="mt-6 max-w-xl text-base leading-8 text-slate-700 md:text-lg">
               Turn ingredients, cravings, and cuisine ideas into perfectly tailored recipes. Beautiful, fast, and effortless cooking guidance for modern home chefs.
             </p>
+            <RotatingShayari
+              seed="landing-home"
+              className="mx-auto mt-6 max-w-xl justify-center text-xl font-black leading-8 lg:mx-0 lg:justify-start"
+            />
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-start">
               <button
                 onClick={() => onNavigate('signup')}

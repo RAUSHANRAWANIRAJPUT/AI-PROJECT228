@@ -1,5 +1,5 @@
-const Recipe = require('../models/Recipe');
-const axios = require('axios');
+import Recipe from '../models/Recipe.js';
+import axios from 'axios';
 
 // @desc    Generate recipe using AI
 // @route   POST /api/recipes/generate
@@ -140,7 +140,7 @@ const toggleFavorite = async (req, res) => {
             ingredients: recipe.ingredients,
             instructions: recipe.instructions,
             steps: recipe.instructions,
-            image: recipe.image || '🥘',
+            image: recipe.image,
             isFavorite: recipe.isFavorite
         });
     } catch (error) {
@@ -155,6 +155,13 @@ const saveRecipe = async (req, res) => {
     const { title, tag, time, servings, ingredients, instructions, image, isVegan = false, cookingTime = 0, cuisine = 'General' } = req.body;
 
     try {
+        // Generate image URL if not provided or if it's an emoji
+        let recipeImage = image;
+        if (!recipeImage || recipeImage === '🥘' || !/^https?:\/\//i.test(recipeImage)) {
+            const query = title ? `food,${title.replace(/[^a-zA-Z0-9\s]/g, '').trim()}` : 'food';
+            recipeImage = `https://source.unsplash.com/600x400/?${encodeURIComponent(query)}`;
+        }
+
         const recipe = await Recipe.create({
             userId: req.user.id,
             title,
@@ -163,7 +170,7 @@ const saveRecipe = async (req, res) => {
             servings,
             ingredients,
             instructions,
-            image,
+            image: recipeImage,
             isFavorite: false,
             isVegan,
             cookingTime,
@@ -205,7 +212,7 @@ const getRecipes = async (req, res) => {
             ingredients: recipe.ingredients,
             instructions: recipe.instructions,
             steps: recipe.instructions,
-            image: recipe.image || '🥘',
+            image: recipe.image,
             isFavorite: recipe.isFavorite,
             isVegan: recipe.isVegan,
             cookingTime: recipe.cookingTime,
@@ -240,10 +247,4 @@ const deleteRecipe = async (req, res) => {
     }
 };
 
-module.exports = {
-    generateRecipe,
-    getRecipes,
-    saveRecipe,
-    deleteRecipe,
-    toggleFavorite
-};
+export { generateRecipe, getRecipes, saveRecipe, deleteRecipe, toggleFavorite };

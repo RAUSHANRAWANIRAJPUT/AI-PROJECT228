@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const recipeSchema = mongoose.Schema({
     userId: {
@@ -32,7 +32,7 @@ const recipeSchema = mongoose.Schema({
     },
     image: {
         type: String,
-        default: '🥘'
+        default: ''
     },
     isFavorite: {
         type: Boolean,
@@ -56,4 +56,4 @@ const recipeSchema = mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Recipe', recipeSchema);
+export default mongoose.model('Recipe', recipeSchema);

@@ -2,10 +2,31 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/dashboard/Sidebar';
 import { recipeService } from '../services/api';
 
-const MyRecipesPage = ({ user, onOpenChat, onLogout, onNavigate }) => {
+const MyRecipesPage = ({ onOpenChat, onLogout, onNavigate }) => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const isValidUrl = (value) => {
+    try {
+      return Boolean(value && /^https?:\/\//i.test(value) && new URL(value));
+    } catch {
+      return false;
+    }
+  };
+
+  const getRecipeImage = (recipe) => {
+    if (recipe.image && isValidUrl(recipe.image)) {
+      return recipe.image;
+    }
+    const query = recipe.title ? `food,${recipe.title.replace(/[^a-zA-Z0-9\s]/g, '').trim()}` : 'food';
+    return `https://source.unsplash.com/600x400/?${encodeURIComponent(query)}`;
+  };
+
+  const handleImageError = (e) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = `https://source.unsplash.com/600x400/?food&sig=${Math.random()}`;
+  };
 
   const fetchRecipes = async () => {
     try {
@@ -109,8 +130,14 @@ const MyRecipesPage = ({ user, onOpenChat, onLogout, onNavigate }) => {
                   className="group overflow-hidden rounded-[28px] border border-border bg-white shadow-[0_18px_60px_rgba(20,20,20,0.08)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl"
                 >
                   <div className="relative overflow-hidden bg-gradient-to-br from-[#fff7e4] via-[#f8e1c7] to-[#f3d6ac] p-6 text-center">
-                    <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-[32px] bg-white/90 text-5xl shadow-sm">
-                      {recipe.image || '🥘'}
+                    <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-[32px] bg-white/90 shadow-sm">
+                      <img
+                        src={getRecipeImage(recipe)}
+                        alt={recipe.title || 'Recipe image'}
+                        loading="lazy"
+                        onError={handleImageError}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
                     <span className="inline-flex rounded-full bg-olive/10 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.24em] text-olive">
                       {recipe.tag || 'Saved'}

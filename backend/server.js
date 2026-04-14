@@ -1,8 +1,9 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const morgan = require('morgan');
-const connectDB = require('./config/db');
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import morgan from 'morgan';
+import connectDB from './config/db.js';
+
 
 // Load env vars
 dotenv.config();
@@ -24,8 +25,11 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/recipes', require('./routes/recipeRoutes'));
+import authRoutes from './routes/authRoutes.js';
+import recipeRoutes from './routes/recipeRoutes.js';
+
+app.use('/api/auth', authRoutes);
+app.use('/api/recipes', recipeRoutes);
 
 // Basic error handler
 app.use((err, req, res, next) => {

@@ -17,6 +17,7 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     const loggedUser = authService.getCurrentUser();
     if (loggedUser) {
       setUser(loggedUser);
@@ -57,14 +58,12 @@ function App() {
         />;
       case 'my-recipes':
         return <MyRecipesPage
-          user={user}
           onOpenChat={() => setIsChatOpen(true)}
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />;
       case 'favorites':
         return <FavoritesPage
-          user={user}
           onOpenChat={() => setIsChatOpen(true)}
           onLogout={handleLogout}
           onNavigate={handleNavigate}

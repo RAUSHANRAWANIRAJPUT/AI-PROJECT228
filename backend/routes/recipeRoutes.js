@@ -1,13 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const { 
+import express from 'express';
+import { 
     generateRecipe, 
     getRecipes, 
     saveRecipe, 
     deleteRecipe,
     toggleFavorite 
-} = require('../controllers/recipeController');
-const { protect } = require('../middleware/authMiddleware');
+} from '../controllers/recipeController.js';
+import { protect } from '../middleware/authMiddleware.js';
+
+const router = express.Router();
 
 router.post('/generate', protect, generateRecipe);
 router.get('/', protect, getRecipes);
@@ -15,4 +16,4 @@ router.post('/', protect, saveRecipe);
 router.put('/:id/favorite', protect, toggleFavorite);
 router.delete('/:id', protect, deleteRecipe);
 
-module.exports = router;
+export default router;
