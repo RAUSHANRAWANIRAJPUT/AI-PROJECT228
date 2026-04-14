@@ -34,6 +34,22 @@ const recipeSchema = mongoose.Schema({
         type: String,
         default: '🥘'
     },
+    isFavorite: {
+        type: Boolean,
+        default: false
+    },
+    isVegan: {
+        type: Boolean,
+        default: false
+    },
+    cookingTime: {
+        type: Number,
+        default: 0
+    },
+    cuisine: {
+        type: String,
+        default: 'General'
+    },
     createdAt: {
         type: Date,
         default: Date.now

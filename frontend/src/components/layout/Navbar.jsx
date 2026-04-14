@@ -27,6 +27,18 @@ const Navbar = ({ onNavigate, currentPage, user }) => {
             >
               My Kitchen
             </span>
+            <span 
+              onClick={() => onNavigate('my-recipes')}
+              className={`text-sm font-bold cursor-pointer transition-colors ${currentPage === 'my-recipes' ? 'text-gold' : 'text-dark hover:text-gold'}`}
+            >
+              My Recipes
+            </span>
+            <span 
+              onClick={() => onNavigate('favorites')}
+              className={`text-sm font-bold cursor-pointer transition-colors ${currentPage === 'favorites' ? 'text-gold' : 'text-dark hover:text-gold'}`}
+            >
+              Favourites
+            </span>
             <div 
               onClick={() => onNavigate('dashboard')}
               className="w-10 h-10 rounded-full bg-olive text-cream flex items-center justify-center font-bold text-sm border-2 border-white shadow-sm cursor-pointer hover:scale-105 transition-transform"

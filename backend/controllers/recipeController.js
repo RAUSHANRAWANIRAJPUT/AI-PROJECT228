@@ -55,8 +55,9 @@ const generateRecipe = async (req, res) => {
                 headers: {
                     'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'Referer': 'https://letmecook.app',
-                    'X-Title': 'Let Me Cook'
+                    'X-OpenRouter-Title': 'Let Me Cook'
                 }
             }
         );
@@ -82,38 +83,76 @@ const generateRecipe = async (req, res) => {
     } catch (error) {
         const apiError = error.response?.data || error.message;
         console.error('AI Generation Error:', apiError);
+        console.error('OpenRouter status:', error.response?.status);
+        console.error('OpenRouter headers:', error.response?.headers);
 
         let message = error.response?.data?.message ||
+            error.response?.data?.error?.message ||
             error.response?.data?.error ||
             error.response?.data?.detail ||
             error.message ||
             'Failed to generate recipe with AI';
 
         if (typeof message === 'object') {
-            message = JSON.stringify(message);
+            if (message.message) {
+                message = message.message;
+            } else {
+                message = JSON.stringify(message);
+            }
+        }
+
+        if (error.response?.status === 401) {
+            message = message || 'OpenRouter authentication failed. Check OPENROUTER_API_KEY and provider access.';
+        }
+
+        if (!error.response) {
+            message = 'Unable to reach OpenRouter API. Check network and host configuration.';
         }
 
         res.status(error.response?.status || 500).json({ message });
     }
 };
 
-// @desc    Get user recipes
-// @route   GET /api/recipes
+// @desc    Toggle recipe favorite
+// @route   PUT /api/recipes/:id/favorite
 // @access  Private
-const getRecipes = async (req, res) => {
+const toggleFavorite = async (req, res) => {
     try {
-        const recipes = await Recipe.find({ userId: req.user.id }).sort({ createdAt: -1 });
-        res.status(200).json(recipes);
+        const recipe = await Recipe.findById(req.params.id);
+
+        if (!recipe) {
+            return res.status(404).json({ message: 'Recipe not found' });
+        }
+
+        if (recipe.userId.toString() !== req.user.id) {
+            return res.status(401).json({ message: 'User not authorized' });
+        }
+
+        recipe.isFavorite = !recipe.isFavorite;
+        await recipe.save();
+
+        res.status(200).json({
+            _id: recipe._id,
+            title: recipe.title,
+            tag: recipe.tag,
+            time: recipe.time,
+            servings: recipe.servings,
+            ingredients: recipe.ingredients,
+            instructions: recipe.instructions,
+            steps: recipe.instructions,
+            image: recipe.image || '🥘',
+            isFavorite: recipe.isFavorite
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-// @desc    Save a recipe
+// @desc    Get user recipes
 // @route   POST /api/recipes
 // @access  Private
 const saveRecipe = async (req, res) => {
-    const { title, tag, time, servings, ingredients, instructions, image } = req.body;
+    const { title, tag, time, servings, ingredients, instructions, image, isVegan = false, cookingTime = 0, cuisine = 'General' } = req.body;
 
     try {
         const recipe = await Recipe.create({
@@ -124,11 +163,57 @@ const saveRecipe = async (req, res) => {
             servings,
             ingredients,
             instructions,
-            image
+            image,
+            isFavorite: false,
+            isVegan,
+            cookingTime,
+            cuisine
         });
         res.status(201).json(recipe);
     } catch (error) {
         res.status(400).json({ message: 'Invalid recipe data' });
+    }
+};
+
+// @desc    Get user recipes
+// @route   GET /api/recipes
+// @access  Private
+const getRecipes = async (req, res) => {
+    try {
+        const { vegan, quick, cuisine } = req.query;
+        const filter = { userId: req.user.id };
+
+        if (vegan === 'true') {
+            filter.isVegan = true;
+        }
+
+        if (quick === 'true') {
+            filter.cookingTime = { $lt: 20 };
+        }
+
+        if (cuisine) {
+            filter.cuisine = { $regex: new RegExp(`^${cuisine}$`, 'i') };
+        }
+
+        const recipes = await Recipe.find(filter).sort({ createdAt: -1 });
+        const formatted = recipes.map((recipe) => ({
+            _id: recipe._id,
+            title: recipe.title,
+            tag: recipe.tag,
+            time: recipe.time,
+            servings: recipe.servings,
+            ingredients: recipe.ingredients,
+            instructions: recipe.instructions,
+            steps: recipe.instructions,
+            image: recipe.image || '🥘',
+            isFavorite: recipe.isFavorite,
+            isVegan: recipe.isVegan,
+            cookingTime: recipe.cookingTime,
+            cuisine: recipe.cuisine
+        }));
+        res.status(200).json(formatted);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -159,5 +244,6 @@ module.exports = {
     generateRecipe,
     getRecipes,
     saveRecipe,
-    deleteRecipe
+    deleteRecipe,
+    toggleFavorite
 };

@@ -55,8 +55,9 @@ export const recipeService = {
         const response = await api.post('/recipes/generate', { prompt });
         return response.data;
     },
-    getRecipes: async () => {
-        const response = await api.get('/recipes');
+    getRecipes: async (filters = {}) => {
+        const query = new URLSearchParams(filters).toString();
+        const response = await api.get(`/recipes${query ? `?${query}` : ''}`);
         return response.data;
     },
     saveRecipe: async (recipeData) => {
@@ -65,6 +66,10 @@ export const recipeService = {
     },
     deleteRecipe: async (id) => {
         const response = await api.delete(`/recipes/${id}`);
+        return response.data;
+    },
+    toggleFavorite: async (id) => {
+        const response = await api.put(`/recipes/${id}/favorite`);
         return response.data;
     }
 };

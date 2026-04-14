@@ -4,13 +4,15 @@ const {
     generateRecipe, 
     getRecipes, 
     saveRecipe, 
-    deleteRecipe 
+    deleteRecipe,
+    toggleFavorite 
 } = require('../controllers/recipeController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.post('/generate', protect, generateRecipe);
 router.get('/', protect, getRecipes);
 router.post('/', protect, saveRecipe);
+router.put('/:id/favorite', protect, toggleFavorite);
 router.delete('/:id', protect, deleteRecipe);
 
 module.exports = router;

@@ -6,6 +6,8 @@ import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import DashboardPage from './pages/DashboardPage'
+import MyRecipesPage from './pages/MyRecipesPage'
+import FavoritesPage from './pages/FavoritesPage'
 import Chatbot from './components/shared/Chatbot'
 import { authService } from './services/api'
 
@@ -50,7 +52,22 @@ function App() {
         return <DashboardPage 
           user={user}
           onOpenChat={() => setIsChatOpen(true)} 
-          onLogout={handleLogout} 
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />;
+      case 'my-recipes':
+        return <MyRecipesPage
+          user={user}
+          onOpenChat={() => setIsChatOpen(true)}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />;
+      case 'favorites':
+        return <FavoritesPage
+          user={user}
+          onOpenChat={() => setIsChatOpen(true)}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
         />;
       default:
         return <LandingPage onNavigate={handleNavigate} />;

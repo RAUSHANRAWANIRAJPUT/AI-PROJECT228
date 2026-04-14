@@ -1,46 +1,132 @@
 import React from 'react';
 
-const recipes = [
-  { img: '🍝', tag: 'Italian', title: 'Spaghetti Carbonara', time: '25 min', servings: '2 servings' },
-  { img: '🍛', tag: 'Indian', title: 'Butter Chicken Masala', time: '45 min', servings: '4 servings' },
-  { img: '🥗', tag: 'Healthy', title: 'Greek Salad Bowl', time: '10 min', servings: '1 serving' },
-  { img: '🍜', tag: 'Japanese', title: 'Tonkotsu Ramen', time: '3 hrs', servings: '2 servings' },
-  { img: '🌮', tag: 'Mexican', title: 'Beef Tacos al Pastor', time: '35 min', servings: '4 servings' },
-  { img: '🍰', tag: 'Dessert', title: 'Classic Tiramisu', time: '30 min', servings: '6 servings' },
-];
+const RecipeGrid = ({ recipes = [], onDelete, onToggleFavorite }) => {
+  const renderIngredients = (ingredients) => {
+    if (!Array.isArray(ingredients) || ingredients.length === 0) {
+      return (
+        <li className="text-sm leading-7 text-slate-500">No ingredients available</li>
+      );
+    }
 
-const RecipeGrid = ({ recipes, onDelete }) => {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {recipes.map((recipe, idx) => (
-        <div 
-          key={recipe._id || idx} 
-          className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer group relative"
-        >
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(recipe._id);
-            }}
-            className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm text-rust w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rust hover:text-white z-10"
+    const visibleItems = ingredients.slice(0, 4);
+    return (
+      <>
+        {visibleItems.map((item, index) => (
+          <li
+            key={`${item}-${index}`}
+            className="text-sm leading-7 text-slate-700 before:content-['•'] before:text-orange-400 before:mr-2 list-none"
           >
-            ✕
-          </button>
-          
-          <div className="h-40 bg-gradient-to-br from-gold-light to-[#E8D4A0] flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-500">
-            {recipe.image || '🥘'}
-          </div>
-          <div className="p-5">
-            <span className="inline-block bg-green-light text-green text-[10px] font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
-              {recipe.tag}
-            </span>
-            <h3 className="font-bold text-dark mb-2 line-clamp-1">{recipe.title}</h3>
-            <div className="flex items-center gap-4 text-xs text-muted font-medium">
-              <span className="flex items-center gap-1">⏱ {recipe.time}</span>
-              <span className="flex items-center gap-1">👤 {recipe.servings}</span>
+            {item}
+          </li>
+        ))}
+        {ingredients.length > 4 && (
+          <li className="text-sm font-semibold text-orange-600">View more</li>
+        )}
+      </>
+    );
+  };
+
+  const renderInstructions = (instructions) => {
+    if (!Array.isArray(instructions) || instructions.length === 0) {
+      return (
+        <li className="text-sm leading-7 text-slate-500">No steps available</li>
+      );
+    }
+    return instructions.map((step, index) => (
+      <li key={`${step}-${index}`} className="flex items-start gap-3 text-sm leading-7 text-slate-600">
+        <span className="mt-[3px] inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#fff2df] text-xs font-semibold text-orange-600">
+          {index + 1}
+        </span>
+        <span>{step}</span>
+      </li>
+    ));
+  };
+
+  const isValidUrl = (value) => {
+    try {
+      return Boolean(value && /^https?:\/\//i.test(value) && new URL(value));
+    } catch {
+      return false;
+    }
+  };
+
+  const getRecipeImage = (recipe, idx) => {
+    const query = recipe.title ? `${recipe.title},food` : 'food';
+    return `https://source.unsplash.com/600x400/?${encodeURIComponent(query)}&sig=${idx}`;
+  };
+
+  const handleImageError = (e) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = `https://source.unsplash.com/600x400/?food&sig=${Math.random()}`;
+  };
+
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      {recipes.map((recipe, idx) => (
+        <article
+          key={recipe._id || idx}
+          className="group relative overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-[0_28px_80px_rgba(15,23,42,0.12)] backdrop-blur-xl transition duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_30px_90px_rgba(15,23,42,0.18)]"
+          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+        >
+          <div className="relative overflow-hidden rounded-t-2xl h-48 bg-slate-100">
+            <img
+              src={getRecipeImage(recipe, idx)}
+              alt={recipe.title || 'Recipe image'}
+              loading="lazy"
+              onError={handleImageError}
+              className="h-full w-full object-cover transition duration-500 ease-out group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
+            <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite?.(recipe._id, !recipe.isFavorite);
+                }}
+                className={`inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-white/90 text-lg shadow-sm transition duration-300 ease-out transform ${recipe.isFavorite ? 'text-orange-600 bg-orange-100 hover:bg-orange-500 hover:text-white' : 'text-slate-900 hover:bg-[#fff4e6] hover:text-orange-600'} hover:scale-105 active:scale-95`}
+                aria-label={recipe.isFavorite ? 'Unfavorite recipe' : 'Favorite recipe'}
+              >
+                {recipe.isFavorite ? '❤️' : '🤍'}
+              </button>
+            </div>
+            <div className="absolute left-4 bottom-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-orange-700 shadow-sm">
+              {recipe.tag || 'Chef Pick'}
             </div>
           </div>
-        </div>
+
+          <div className="px-6 pb-6 pt-6 sm:px-7">
+            <div className="mb-5 flex flex-wrap items-center gap-3 text-sm text-slate-700">
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#fff2df] px-3 py-2 font-medium shadow-sm">
+                <span>⏱</span>
+                <span>{recipe.time || '—'}</span>
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#f7f3ee] px-3 py-2 font-medium text-slate-700 shadow-sm">
+                <span>👤</span>
+                <span>{recipe.servings || '—'}</span>
+              </span>
+            </div>
+
+            <h3 className="text-2xl font-semibold tracking-[-0.04em] text-slate-950 leading-tight mb-4">
+              {recipe.title || 'Untitled Recipe'}
+            </h3>
+
+            <div className="space-y-6 border-t border-slate-200/70 pt-6">
+              <div>
+                <div className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                  Ingredients
+                </div>
+                <ul className="grid gap-2 pl-3">{renderIngredients(recipe.ingredients)}</ul>
+              </div>
+
+              <div>
+                <div className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                  Steps
+                </div>
+                <ol className="grid gap-3 pl-0">{renderInstructions(recipe.instructions)}</ol>
+              </div>
+            </div>
+          </div>
+        </article>
       ))}
     </div>
   );

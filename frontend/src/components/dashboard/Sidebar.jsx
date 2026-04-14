@@ -1,14 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const Sidebar = ({ onOpenChat, onLogout }) => {
+const cuisineOptions = ['Indian', 'Chinese', 'Italian', 'Mexican', 'Japanese', 'Mediterranean'];
+
+const Sidebar = ({ onNavigate, currentPage, filters = {}, onFilterChange, onOpenChat, onLogout }) => {
+  const [showCuisineMenu, setShowCuisineMenu] = useState(false);
+
+  const activeClass = 'rounded-xl flex items-center gap-3 text-sm font-medium cursor-pointer p-3 bg-dark text-cream';
+  const inactiveClass = 'rounded-xl flex items-center gap-3 text-sm font-medium cursor-pointer p-3 text-muted hover:bg-cream transition-colors';
+
   return (
     <div className="bg-card border-r border-border h-full p-6 flex flex-col gap-6 overflow-y-auto">
       <div className="space-y-1">
-        <div className="bg-dark text-cream p-3 rounded-xl flex items-center gap-3 text-sm font-medium cursor-pointer">
+        <div
+          onClick={() => onNavigate('dashboard')}
+          className={currentPage === 'dashboard' ? activeClass : inactiveClass}
+        >
           <span className="text-lg">🏠</span> Dashboard
         </div>
-        <div className="text-muted hover:bg-cream p-3 rounded-xl flex items-center gap-3 text-sm font-medium cursor-pointer transition-colors">
+        <div
+          onClick={() => onNavigate('my-recipes')}
+          className={currentPage === 'my-recipes' ? activeClass : inactiveClass}
+        >
           <span className="text-lg">📚</span> My Recipes
+        </div>
+        <div
+          onClick={() => onNavigate('favorites')}
+          className={currentPage === 'favorites' ? activeClass : inactiveClass}
+        >
+          <span className="text-lg">❤️</span> Favourites
         </div>
         <div 
           onClick={onOpenChat}
@@ -16,22 +35,59 @@ const Sidebar = ({ onOpenChat, onLogout }) => {
         >
           <span className="text-lg">💬</span> AI Chatbot
         </div>
-        <div className="text-muted hover:bg-cream p-3 rounded-xl flex items-center gap-3 text-sm font-medium cursor-pointer transition-colors">
-          <span className="text-lg">❤️</span> Favourites
-        </div>
       </div>
 
       <div>
         <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3 mb-4">Filters</div>
         <div className="space-y-1">
-          <div className="text-muted hover:bg-cream p-3 rounded-xl flex items-center gap-3 text-sm font-medium cursor-pointer transition-colors">
+          <div
+            onClick={() => onFilterChange('vegan', !filters.vegan)}
+            className={filters.vegan ? activeClass : inactiveClass}
+          >
             <span className="text-lg">🥗</span> Vegan
           </div>
-          <div className="text-muted hover:bg-cream p-3 rounded-xl flex items-center gap-3 text-sm font-medium cursor-pointer transition-colors">
+          <div
+            onClick={() => onFilterChange('quick', !filters.quick)}
+            className={filters.quick ? activeClass : inactiveClass}
+          >
             <span className="text-lg">🔥</span> Quick ({"<"} 20 min)
           </div>
-          <div className="text-muted hover:bg-cream p-3 rounded-xl flex items-center gap-3 text-sm font-medium cursor-pointer transition-colors">
-            <span className="text-lg">🌍</span> World Cuisines
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowCuisineMenu((prev) => !prev)}
+              className={filters.cuisine ? activeClass : inactiveClass}
+            >
+              <span className="text-lg">🌍</span>
+              {filters.cuisine ? ` ${filters.cuisine}` : ' World Cuisines'}
+            </button>
+            {showCuisineMenu && (
+              <div className="mt-2 rounded-3xl border border-border bg-white shadow-sm overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onFilterChange('cuisine', '');
+                    setShowCuisineMenu(false);
+                  }}
+                  className={`w-full text-left px-4 py-3 text-sm ${filters.cuisine === '' ? 'bg-[#F2EDE3] font-semibold' : 'hover:bg-cream'}`}
+                >
+                  All Cuisines
+                </button>
+                {cuisineOptions.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => {
+                      onFilterChange('cuisine', filters.cuisine === option ? '' : option);
+                      setShowCuisineMenu(false);
+                    }}
+                    className={`w-full text-left px-4 py-3 text-sm ${filters.cuisine === option ? 'bg-[#F2EDE3] font-semibold' : 'hover:bg-cream'}`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

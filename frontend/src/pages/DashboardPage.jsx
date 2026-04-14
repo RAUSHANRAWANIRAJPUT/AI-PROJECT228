@@ -3,26 +3,34 @@ import Sidebar from '../components/dashboard/Sidebar';
 import RecipeGrid from '../components/dashboard/RecipeGrid';
 import { recipeService } from '../services/api';
 
-const DashboardPage = ({ user, onOpenChat, onLogout }) => {
+const DashboardPage = ({ user, onOpenChat, onLogout, onNavigate }) => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [prompt, setPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
+  const [filters, setFilters] = useState({ vegan: false, quick: false, cuisine: '' });
 
   useEffect(() => {
-    fetchRecipes();
-  }, []);
+    fetchRecipes(filters);
+  }, [filters]);
 
-  const fetchRecipes = async () => {
+  const fetchRecipes = async (filterParams = filters) => {
     try {
       setLoading(true);
-      const data = await recipeService.getRecipes();
+      const data = await recipeService.getRecipes(filterParams);
       setRecipes(data);
     } catch (err) {
       console.error('Failed to fetch recipes:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value
+    }));
   };
 
   const handleGenerate = async () => {
@@ -80,7 +88,14 @@ const DashboardPage = ({ user, onOpenChat, onLogout }) => {
 
       <div className="flex flex-col md:flex-row min-h-[calc(100vh-73px)]">
         <aside className="w-full md:w-64 flex-shrink-0 md:sticky md:top-[73px] md:h-[calc(100vh-73px)] hidden md:block">
-          <Sidebar onOpenChat={onOpenChat} onLogout={onLogout} />
+          <Sidebar
+            onNavigate={onNavigate}
+            currentPage="dashboard"
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onOpenChat={onOpenChat}
+            onLogout={onLogout}
+          />
         </aside>
 
         <main className="flex-1 p-6 md:p-10 overflow-y-auto">
