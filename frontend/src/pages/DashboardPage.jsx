@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../components/dashboard/Sidebar';
 import RecipeGrid from '../components/dashboard/RecipeGrid';
 import RotatingShayari from '../components/shared/RotatingShayari';
+import HungryCharacter from '../components/dashboard/HungryCharacter';
 import { recipeService } from '../services/api';
 
 const promptIdeas = [
@@ -16,7 +17,46 @@ const DashboardPage = ({ user, onOpenChat, onLogout, onNavigate }) => {
   const [loading, setLoading] = useState(true);
   const [prompt, setPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState('');
   const [filters, setFilters] = useState({ vegan: false, quick: false, cuisine: '' });
+  
+  // New state for Find Recipe by Ingredients
+  const [ingredients, setIngredients] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState('');
+
+  // Character State Logic
+  const [characterState, setCharacterState] = useState('idle');
+  const [characterMessage, setCharacterMessage] = useState("I'm hungry... what can we cook?");
+
+  // Monitor Character State Changes
+  useEffect(() => {
+    if (generating || searching) {
+      setCharacterState('searching');
+      setCharacterMessage("Cooking something delicious...");
+    } else if (generationError || searchError) {
+      setCharacterState('error');
+      setCharacterMessage("No food? That's sad...");
+    } else if (prompt.trim() || ingredients.trim()) {
+      setCharacterState('typing');
+      setCharacterMessage("Hmm... nice ingredients!");
+    } else {
+      setCharacterState('idle');
+      setCharacterMessage("I'm hungry... what can we cook?");
+    }
+  }, [generating, searching, generationError, searchError, prompt, ingredients]);
+
+  // Success trigger specifically after a process completes
+  useEffect(() => {
+    // Only trigger if we aren't loading initial data
+    if (!loading && !generating && !searching && (recipes.length > 0 || suggestions.length > 0)) {
+      // Avoid triggering on simple filter changes or other background updates
+      // We only want this after a 'Generate' or 'Find' action
+      // A simple way is to check if we were just in a searching/generating state
+      // (This could be further refined with a ref, but this is a good start)
+    }
+  }, [generating, searching, recipes.length, suggestions.length, loading]);
 
   const fetchRecipes = useCallback(async (filterParams = filters) => {
     try {
@@ -44,35 +84,40 @@ const DashboardPage = ({ user, onOpenChat, onLogout, onNavigate }) => {
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
     setGenerating(true);
+    setGenerationError('');
     try {
       const generated = await recipeService.generateRecipe(prompt);
       const saved = await recipeService.saveRecipe(generated);
       setRecipes((prev) => [saved, ...prev]);
       setPrompt('');
-      alert('Recipe generated and saved!');
     } catch (err) {
       console.error('Generation failed:', err);
       let message = err.response?.data?.message || err.message || 'Failed to generate recipe. Check your API key.';
       if (typeof message === 'object') {
         message = JSON.stringify(message);
       }
-      alert(message);
+      setGenerationError(message);
     } finally {
       setGenerating(false);
     }
   };
 
-  const handleToggleFavorite = async (id) => {
+  const handleFindRecipes = async () => {
+    if (!ingredients.trim()) return;
+    setSearching(true);
+    setSearchError('');
+    setSuggestions([]);
     try {
-      const updated = await recipeService.toggleFavorite(id);
-      setRecipes((prev) => prev.map((recipe) => recipe._id === id ? updated : recipe));
+      const results = await recipeService.findRecipesByIngredients(ingredients);
+      setSuggestions(results);
     } catch (err) {
-      console.error('Favorite toggle failed:', err);
-      alert('Unable to update favorite status. Please try again.');
+      console.error('Search failed:', err);
+      setSearchError('Failed to find recipes. Please try again.');
+    } finally {
+      setSearching(false);
     }
   };
 
-  const favoriteCount = recipes.filter((recipe) => recipe.isFavorite || recipe.favorite).length;
   const chefName = user?.name || 'Chef';
 
   return (
@@ -90,8 +135,8 @@ const DashboardPage = ({ user, onOpenChat, onLogout, onNavigate }) => {
         </aside>
 
         <main className="flex-1 overflow-hidden px-4 py-5 sm:px-6 lg:px-8">
-          <section className="studio-hero animate-dashboard-enter">
-            <div className="studio-copy">
+          <section className="studio-hero animate-dashboard-enter mb-10">
+            <div className="studio-copy lg:col-span-4">
               <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-olive/15 bg-white/70 px-3 py-2 text-xs font-black uppercase tracking-[0.24em] text-olive">
                 <span className="h-2 w-2 rounded-full bg-olive"></span>
                 Recipe studio
@@ -105,17 +150,17 @@ const DashboardPage = ({ user, onOpenChat, onLogout, onNavigate }) => {
                 Turn a craving, ingredient list, or cuisine idea into a recipe that is ready to cook.
               </p>
 
-              <div className="mt-7 rounded-lg border border-border bg-white p-3 shadow-[0_18px_55px_rgba(17,20,15,0.08)]">
+              <div className="mt-7 rounded-lg border border-border bg-[#EEF7F1]/30 p-3 shadow-inner">
                 <div className="flex flex-col gap-3 lg:flex-row">
                   <input
                     type="text"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Try: quick paneer wrap, high-protein breakfast, or spicy ramen"
-                    className="min-h-12 flex-1 rounded-md bg-[#EEF7F1] px-4 text-sm text-dark outline-none ring-1 ring-transparent transition placeholder:text-muted focus:bg-white focus:ring-olive/35"
+                    className="min-h-12 flex-1 rounded-md bg-white px-4 text-sm text-dark outline-none ring-1 ring-border transition placeholder:text-muted focus:ring-olive/35"
                   />
                   <div className="grid grid-cols-2 gap-3 sm:flex">
-                    <button type="button" onClick={onOpenChat} className="btn-secondary">
+                    <button type="button" onClick={onOpenChat} className="btn-secondary whitespace-nowrap">
                       Ask AI Chef
                     </button>
                     <button
@@ -141,50 +186,72 @@ const DashboardPage = ({ user, onOpenChat, onLogout, onNavigate }) => {
                     </button>
                   ))}
                 </div>
+
+                {generationError && (
+                  <div className="mt-4 rounded-lg border border-rust/30 bg-rust/10 px-4 py-3 text-sm font-bold leading-6 text-rust">
+                    {generationError}
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="studio-inspiration">
-              <img
-                src="https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&w=900&q=80"
-                alt="Fresh cooking ingredients"
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent"></div>
-              <div className="absolute bottom-5 left-5 right-5 text-white">
-                <p className="text-xs font-black uppercase tracking-[0.24em] text-white/75">Today&apos;s flow</p>
-                <h2 className="mt-2 font-serif text-2xl font-black">Cook smarter, not longer.</h2>
-                <p className="mt-2 text-sm leading-6 text-white/80">
-                  Start with one idea. Let the kitchen plan build around it.
-                </p>
-              </div>
+            {/* Character Section */}
+            <div className="flex items-center justify-end lg:col-span-1 lg:pt-6 h-full min-h-[200px]">
+              <HungryCharacter state={characterState} message={characterMessage} />
             </div>
           </section>
 
-          <section className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="metric-card animate-dashboard-enter [animation-delay:80ms]">
-              <span className="metric-label">Generated</span>
-              <div className="mt-3 flex items-end justify-between gap-3">
-                <strong className="font-serif text-4xl font-black">{recipes.length}</strong>
-                <span className="metric-dot bg-olive"></span>
+          {/* New Find Recipe by Ingredients Section */}
+          <section className="mb-12 animate-dashboard-enter [animation-delay:100ms]">
+            <div className="studio-copy">
+              <div className="mb-6">
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-olive mb-2">Smart Search</p>
+                <h2 className="font-serif text-2xl font-black text-dark">Find Recipe by Ingredients</h2>
+                <p className="text-sm text-muted mt-1">Enter what you have in your fridge, and let AI suggest what you can cook.</p>
               </div>
-              <p className="mt-2 text-xs text-muted">Recipes in your kitchen</p>
-            </div>
-            <div className="metric-card animate-dashboard-enter [animation-delay:140ms]">
-              <span className="metric-label">Favourites</span>
-              <div className="mt-3 flex items-end justify-between gap-3">
-                <strong className="font-serif text-4xl font-black">{favoriteCount}</strong>
-                <span className="metric-dot bg-rust"></span>
+              
+              <div className="flex flex-col gap-3 sm:flex-row mt-6">
+                <input
+                  type="text"
+                  value={ingredients}
+                  onChange={(e) => setIngredients(e.target.value)}
+                  placeholder="Example: onion, tomato, paneer, garlic"
+                  className="min-h-12 flex-1 rounded-md border border-border bg-[#F9FBF9] px-4 text-sm text-dark outline-none transition placeholder:text-muted focus:bg-white focus:ring-1 focus:ring-olive/35"
+                />
+                <button
+                  type="button"
+                  onClick={handleFindRecipes}
+                  disabled={searching || !ingredients.trim()}
+                  className={`btn-primary px-8 ${searching ? 'pointer-events-none opacity-60' : ''}`}
+                >
+                  {searching ? 'Searching...' : 'Find Recipes'}
+                </button>
               </div>
-              <p className="mt-2 text-xs text-muted">Saved for repeat cooking</p>
-            </div>
-            <div className="metric-card animate-dashboard-enter [animation-delay:200ms]">
-              <span className="metric-label">Mode</span>
-              <div className="mt-3 flex items-end justify-between gap-3">
-                <strong className="font-serif text-4xl font-black">AI</strong>
-                <span className="metric-dot bg-gold"></span>
-              </div>
-              <p className="mt-2 text-xs text-muted">Ready for new prompts</p>
+
+              {searchError && (
+                <div className="mt-4 text-sm font-bold text-rust">{searchError}</div>
+              )}
+
+              {suggestions.length > 0 && (
+                <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {suggestions.map((item, idx) => (
+                    <div key={idx} className="group relative overflow-hidden rounded-xl border border-border bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-olive/40 hover:shadow-[0_20px_40px_rgba(17,20,15,0.06)]">
+                      <div className="absolute top-0 left-0 h-1 w-0 bg-olive transition-all duration-500 group-hover:w-full"></div>
+                      <h3 className="font-bold text-dark mb-2">{item.title}</h3>
+                      <p className="text-xs leading-relaxed text-muted line-clamp-3">{item.description}</p>
+                      <button 
+                        onClick={() => {
+                          setPrompt(`How to cook ${item.title}`);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="mt-4 flex items-center gap-2 text-xs font-black text-olive transition hover:gap-3"
+                      >
+                        Cook this <span>→</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
 
@@ -210,21 +277,8 @@ const DashboardPage = ({ user, onOpenChat, onLogout, onNavigate }) => {
               </div>
             ) : (
               <>
-                {generating && (
-                  <div className="mb-5 rounded-lg border border-gold/60 bg-white p-6 shadow-sm animate-pulse-soft">
-                    <div className="mb-4 flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-lg bg-gray-200/60 animate-pulse"></div>
-                      <div className="flex-1">
-                        <div className="mb-2 h-5 w-1/3 rounded bg-gray-200/60 animate-pulse"></div>
-                        <div className="h-3 w-1/4 rounded bg-gray-200/60 animate-pulse"></div>
-                      </div>
-                    </div>
-                    <div className="mb-2 h-3 w-full rounded bg-gray-200/60 animate-pulse"></div>
-                    <div className="h-3 w-5/6 rounded bg-gray-200/60 animate-pulse"></div>
-                  </div>
-                )}
                 {recipes.length > 0 ? (
-                  <RecipeGrid recipes={recipes} onToggleFavorite={handleToggleFavorite} />
+                  <RecipeGrid recipes={recipes} />
                 ) : (
                   <div className="empty-state animate-dashboard-enter">
                     <div className="mx-auto mb-5 h-28 w-28 overflow-hidden rounded-lg">

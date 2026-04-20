@@ -15,7 +15,6 @@ const Sidebar = ({ onNavigate, currentPage, filters = {}, onFilterChange, onOpen
   const navItems = [
     { key: 'dashboard', label: 'Dashboard', icon: 'D' },
     { key: 'my-recipes', label: 'My Recipes', icon: 'R' },
-    { key: 'favorites', label: 'Favourites', icon: 'F' },
   ];
 
   const itemClass = (active) =>

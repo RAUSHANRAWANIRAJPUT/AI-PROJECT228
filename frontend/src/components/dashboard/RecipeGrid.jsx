@@ -84,7 +84,7 @@ const hashText = (value) => {
   return [...value].reduce((hash, char) => hash + char.charCodeAt(0), 0);
 };
 
-const RecipeGrid = ({ recipes = [], onToggleFavorite }) => {
+const RecipeGrid = ({ recipes = [] }) => {
   const [expanded, setExpanded] = useState({});
 
   const getSteps = (recipe) => {
@@ -115,6 +115,7 @@ const RecipeGrid = ({ recipes = [], onToggleFavorite }) => {
       recipe.title,
       recipe.cuisine,
       recipe.tag,
+      recipe.image_query,
       ...(Array.isArray(recipe.ingredients) ? recipe.ingredients : []),
     ].join(' ').toLowerCase();
 
@@ -210,7 +211,6 @@ const RecipeGrid = ({ recipes = [], onToggleFavorite }) => {
       {recipes.map((recipe, idx) => {
         const key = getRecipeKey(recipe, idx);
         const steps = getSteps(recipe);
-        const isFavorite = recipe.isFavorite || recipe.favorite;
 
         return (
           <article
@@ -230,19 +230,6 @@ const RecipeGrid = ({ recipes = [], onToggleFavorite }) => {
               <div className="absolute left-4 top-4 rounded-md bg-white/90 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.2em] text-olive shadow-sm">
                 {recipe.tag || getMealPeriod()}
               </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (recipe._id) onToggleFavorite?.(recipe._id);
-                }}
-                className={`absolute right-4 top-4 rounded-lg border border-white/80 px-3 py-2 text-xs font-black shadow-sm transition hover:-translate-y-0.5 ${
-                  isFavorite ? 'bg-rust text-white' : 'bg-white/90 text-dark hover:text-rust'
-                }`}
-                aria-label={isFavorite ? 'Unfavorite recipe' : 'Favorite recipe'}
-              >
-                {isFavorite ? 'Saved' : 'Save'}
-              </button>
               <div className="absolute bottom-4 left-4 right-4">
                 <h3 className="line-clamp-2 font-serif text-2xl font-black leading-tight text-white drop-shadow">
                   {recipe.title || 'Untitled Recipe'}
@@ -252,9 +239,14 @@ const RecipeGrid = ({ recipes = [], onToggleFavorite }) => {
 
             <div className="p-5">
               <div className="mb-5 flex flex-wrap gap-2 text-xs font-bold text-dark">
-                <span className="rounded-md bg-[#E8F5EE] px-3 py-2">{recipe.time || 'Time pending'}</span>
+                <span className="rounded-md bg-[#E8F5EE] px-3 py-2">
+                  Prep: {recipe.preparation_time || 'Ready'}
+                </span>
+                <span className="rounded-md bg-[#E8F5EE] px-3 py-2">
+                  Cook: {recipe.cooking_time || recipe.time || 'Time pending'}
+                </span>
                 <span className="rounded-md bg-[#FFF1BF] px-3 py-2">{recipe.servings || 'Servings pending'}</span>
-                <span className="rounded-md bg-[#F1EAFB] px-3 py-2">{recipe.cuisine || 'General'}</span>
+                <span className="rounded-md bg-[#F1EAFB] px-3 py-2">{recipe.difficulty || recipe.cuisine || 'Easy'}</span>
               </div>
 
               <div className="grid gap-5">
@@ -267,6 +259,23 @@ const RecipeGrid = ({ recipes = [], onToggleFavorite }) => {
                   <h4 className="mb-3 text-[11px] font-black uppercase tracking-[0.22em] text-muted">Method</h4>
                   <ol className="grid gap-3">{renderInstructions(steps, key)}</ol>
                 </section>
+
+                {(recipe.serving_suggestion || recipe.chef_tips) && (
+                  <section className="rounded-lg bg-[#FFF8E6] p-4">
+                    {recipe.serving_suggestion && (
+                      <p className="text-sm leading-6 text-dark/80">
+                        <span className="font-black text-dark">Serve: </span>
+                        {recipe.serving_suggestion}
+                      </p>
+                    )}
+                    {recipe.chef_tips && (
+                      <p className="mt-2 text-sm leading-6 text-dark/80">
+                        <span className="font-black text-dark">Chef tip: </span>
+                        {recipe.chef_tips}
+                      </p>
+                    )}
+                  </section>
+                )}
               </div>
             </div>
           </article>

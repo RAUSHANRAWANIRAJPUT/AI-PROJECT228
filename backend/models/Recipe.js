@@ -30,13 +30,33 @@ const recipeSchema = mongoose.Schema({
         type: [String],
         required: [true, 'Please add instructions']
     },
-    image: {
+    preparationTime: {
         type: String,
         default: ''
     },
-    isFavorite: {
-        type: Boolean,
-        default: false
+    cookingTimeText: {
+        type: String,
+        default: ''
+    },
+    difficulty: {
+        type: String,
+        default: 'Easy'
+    },
+    servingSuggestion: {
+        type: String,
+        default: ''
+    },
+    chefTips: {
+        type: String,
+        default: ''
+    },
+    imageQuery: {
+        type: String,
+        default: ''
+    },
+    image: {
+        type: String,
+        default: ''
     },
     isVegan: {
         type: Boolean,

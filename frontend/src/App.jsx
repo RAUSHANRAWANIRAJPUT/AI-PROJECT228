@@ -7,7 +7,6 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import DashboardPage from './pages/DashboardPage'
 import MyRecipesPage from './pages/MyRecipesPage'
-import FavoritesPage from './pages/FavoritesPage'
 import Chatbot from './components/shared/Chatbot'
 import { authService } from './services/api'
 
@@ -58,12 +57,6 @@ function App() {
         />;
       case 'my-recipes':
         return <MyRecipesPage
-          onOpenChat={() => setIsChatOpen(true)}
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />;
-      case 'favorites':
-        return <FavoritesPage
           onOpenChat={() => setIsChatOpen(true)}
           onLogout={handleLogout}
           onNavigate={handleNavigate}

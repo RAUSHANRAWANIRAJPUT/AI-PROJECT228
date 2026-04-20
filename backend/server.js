@@ -6,7 +6,7 @@ import connectDB from './config/db.js';
 
 
 // Load env vars
-dotenv.config();
+dotenv.config({ override: true });
 
 // Connect to database
 connectDB();

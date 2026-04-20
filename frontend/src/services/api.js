@@ -76,8 +76,8 @@ export const recipeService = {
         const response = await api.delete(`/recipes/${id}`);
         return response.data;
     },
-    toggleFavorite: async (id) => {
-        const response = await api.put(`/recipes/${id}/favorite`);
+    findRecipesByIngredients: async (ingredients) => {
+        const response = await api.post('/recipes/find-recipes', { ingredients });
         return response.data;
     }
 };
