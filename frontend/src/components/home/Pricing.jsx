@@ -1,85 +1,96 @@
 import React from 'react';
 
-const plans = [
-  {
-    name: 'Starter',
-    price: 'Free',
-    period: 'forever',
-    features: ['10 recipes per month', 'Basic chatbot access', 'Recipe history (30 days)', '3 cuisine filters'],
-    cta: 'Get Started',
-    featured: false
-  },
-  {
-    name: 'Pro Chef',
-    price: '$9',
-    period: '/ month',
-    features: ['Unlimited recipes', 'Full chatbot with memory', 'Lifetime recipe history', 'All cuisine & diet filters', 'Priority AI responses'],
-    cta: 'Start Free Trial',
-    featured: true
-  },
-  {
-    name: 'Team',
-    price: '$29',
-    period: '/ month',
-    features: ['Everything in Pro', 'Up to 5 members', 'Shared recipe collections', 'Analytics dashboard', 'Priority support'],
-    cta: 'Contact Sales',
-    featured: false
-  }
-];
-
 const Pricing = ({ onNavigate }) => {
+  const tiers = [
+    {
+      name: 'Free',
+      price: '0',
+      description: 'Perfect for casual home cooks starting their AI journey.',
+      features: ['5 recipes per day', 'Basic AI engine', 'Community support', 'Standard response time'],
+      buttonText: 'Get Started',
+      highlight: false,
+    },
+    {
+      name: 'Pro',
+      price: '9',
+      description: 'For passionate foodies who want more power and speed.',
+      features: ['Unlimited recipes', 'Advanced AI (GPT-4 tier)', 'Priority generation', 'Save favorite recipes', 'PDF exports'],
+      buttonText: 'Go Pro',
+      highlight: true,
+    },
+    {
+      name: 'Chef',
+      price: '29',
+      description: 'Advanced features for culinary professionals and bloggers.',
+      features: ['Everything in Pro', 'Custom cuisine training', 'Nutrition analysis', 'API access (Beta)', 'Personal culinary assistant'],
+      buttonText: 'Contact Sales',
+      highlight: false,
+    },
+  ];
+
   return (
-    <section id="pricing" className="py-24 px-6 md:px-12 bg-cream text-center">
-      <div className="max-w-6xl mx-auto">
-        <span className="text-gold text-xs font-semibold uppercase tracking-widest mb-3 block">Pricing</span>
-        <h2 className="font-serif text-4xl md:text-5xl font-bold text-dark mb-12 mx-auto leading-tight">Simple, honest pricing</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {plans.map((plan, idx) => (
-            <div 
-              key={idx} 
-              className={`rounded-[24px] p-8 text-left transition-all duration-300 hover:-translate-y-2 border-2 ${
-                plan.featured 
-                ? 'bg-dark text-cream border-dark shadow-2xl scale-105 z-10' 
-                : 'bg-card text-dark border-border shadow-sm'
+    <div className="py-12">
+      <div className="mb-16 text-center">
+        <h2 className="text-3xl font-black text-slate-950 sm:text-5xl">Simple, transparent pricing</h2>
+        <p className="mt-4 text-lg text-slate-600">Choose the plan that fits your culinary ambitions.</p>
+      </div>
+
+      <div className="grid gap-8 md:grid-cols-3">
+        {tiers.map((tier) => (
+          <div
+            key={tier.name}
+            className={`relative flex flex-col rounded-[2.5rem] p-8 transition-all duration-500 hover:-translate-y-2 ${
+              tier.highlight
+                ? 'bg-slate-950 text-white shadow-[0_40px_100px_-20px_rgba(15,23,42,0.4)]'
+                : 'border border-slate-200 bg-white shadow-xl hover:shadow-2xl'
+            }`}
+          >
+            {tier.highlight && (
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                Most Popular
+              </div>
+            )}
+
+            <div className="mb-8">
+              <h3 className={`text-xl font-bold ${tier.highlight ? 'text-amber-400' : 'text-slate-900'}`}>
+                {tier.name}
+              </h3>
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="text-4xl font-black">${tier.price}</span>
+                <span className={`text-sm ${tier.highlight ? 'text-slate-400' : 'text-slate-500'}`}>/month</span>
+              </div>
+              <p className={`mt-4 text-sm leading-6 ${tier.highlight ? 'text-slate-300' : 'text-slate-600'}`}>
+                {tier.description}
+              </p>
+            </div>
+
+            <ul className="mb-10 flex-1 space-y-4">
+              {tier.features.map((feature) => (
+                <li key={feature} className="flex items-center gap-3 text-sm">
+                  <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${
+                    tier.highlight ? 'bg-amber-500 text-slate-950' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    ✓
+                  </span>
+                  <span className={tier.highlight ? 'text-slate-200' : 'text-slate-700'}>{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            <button
+              onClick={() => onNavigate('signup')}
+              className={`w-full rounded-2xl py-4 text-sm font-bold transition-all duration-300 ${
+                tier.highlight
+                  ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white hover:opacity-90 hover:shadow-lg hover:shadow-orange-500/20'
+                  : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
               }`}
             >
-              <div className={`text-xs font-bold uppercase tracking-widest mb-4 ${plan.featured ? 'text-gold-light' : 'text-muted'}`}>
-                {plan.name}
-              </div>
-              <div className="flex items-baseline gap-1 mb-2">
-                <span className={`font-serif text-5xl font-black ${plan.featured ? 'text-gold' : 'text-dark'}`}>{plan.price}</span>
-                <span className={`text-sm ${plan.featured ? 'text-gray-400' : 'text-muted'}`}>{plan.period}</span>
-              </div>
-              
-              <ul className="space-y-4 my-8">
-                {plan.features.map((feat, fIdx) => (
-                  <li key={fIdx} className="flex items-center gap-3 text-sm">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${plan.featured ? 'bg-white/10' : 'bg-green-light'}`}>
-                       <svg className={`w-3 h-3 ${plan.featured ? 'text-gold' : 'text-green'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                       </svg>
-                    </div>
-                    <span className={plan.featured ? 'text-gray-300' : 'text-muted'}>{feat}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <button 
-                onClick={() => onNavigate('signup')}
-                className={`w-full py-3 rounded-xl font-bold text-sm transition-all cursor-pointer ${
-                  plan.featured 
-                  ? 'bg-gold text-dark hover:bg-gold-light' 
-                  : 'bg-transparent border border-border hover:border-dark text-dark'
-                }`}
-              >
-                {plan.cta}
-              </button>
-            </div>
-          ))}
-        </div>
+              {tier.buttonText}
+            </button>
+          </div>
+        ))}
       </div>
-    </section>
+    </div>
   );
 };
 

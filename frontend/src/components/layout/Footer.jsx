@@ -21,10 +21,10 @@ const Footer = ({ onNavigate }) => {
           <div>
             <h4 className="text-gray-500 text-xs font-medium uppercase tracking-widest mb-4">Product</h4>
             <div className="flex flex-col gap-2">
-              <a className="text-gray-400 hover:text-cream text-sm transition-colors cursor-pointer">Features</a>
-              <a className="text-gray-400 hover:text-cream text-sm transition-colors cursor-pointer">Pricing</a>
+              <a href="#features" className="text-gray-400 hover:text-cream text-sm transition-colors cursor-pointer">Features</a>
+              <a href="#how" className="text-gray-400 hover:text-cream text-sm transition-colors cursor-pointer">How it Works</a>
+              <a href="#pricing" className="text-gray-400 hover:text-cream text-sm transition-colors cursor-pointer">Pricing</a>
               <a className="text-gray-400 hover:text-cream text-sm transition-colors cursor-pointer">Changelog</a>
-              <a className="text-gray-400 hover:text-cream text-sm transition-colors cursor-pointer">Roadmap</a>
             </div>
           </div>
           

@@ -7,25 +7,20 @@ const generateToken = (id) => {
         expiresIn: '30d'
     });
 };
-
 // @desc    Register new user
 // @route   POST /api/auth/signup
 // @access  Public
 const registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
-
         if (!name || !email || !password) {
             return res.status(400).json({ message: 'Please add all fields' });
         }
-
         // Check if user exists
         const userExists = await User.findOne({ email });
-
         if (userExists) {
             return res.status(400).json({ message: 'User already exists' });
         }
-
         // Create user
         const user = await User.create({
             name,
@@ -50,7 +45,6 @@ const registerUser = async (req, res) => {
             const messages = Object.values(error.errors).map((err) => err.message);
             return res.status(400).json({ message: messages.join(', ') });
         }
-
         if (error.code === 11000) {
             return res.status(400).json({ message: 'Email already exists' });
         }
@@ -60,7 +54,6 @@ const registerUser = async (req, res) => {
         });
     }
 };
-
 // @desc    Authenticate a user
 // @route   POST /api/auth/login
 // @access  Public
@@ -88,5 +81,4 @@ const loginUser = async (req, res) => {
         });
     }
 };
-
 export { registerUser, loginUser };

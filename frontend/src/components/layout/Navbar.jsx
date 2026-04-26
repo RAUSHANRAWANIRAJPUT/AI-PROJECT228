@@ -47,7 +47,7 @@ const Navbar = ({ onNavigate, currentPage, user }) => {
           <div className="flex items-center gap-2">
             {navLink('dashboard', 'My Kitchen')}
             {navLink('my-recipes', 'My Recipes')}
-            {navLink('favorites', 'Favourites')}
+            {navLink('home', 'Home')}
             <button
               type="button"
               onClick={() => onNavigate('dashboard')}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import RotatingShayari from '../components/shared/RotatingShayari';
+import Pricing from '../components/home/Pricing';
 
 const LandingPage = ({ onNavigate }) => {
   const [visibleSections, setVisibleSections] = useState({});
@@ -116,6 +117,7 @@ const LandingPage = ({ onNavigate }) => {
       </section>
 
       <section
+        id="features"
         data-reveal="features"
         className={`mx-auto max-w-7xl px-6 pb-20 md:px-10 transition-all duration-700 ease-out ${revealClass('features')}`}
         style={{ transitionDelay: '120ms' }}
@@ -154,6 +156,7 @@ const LandingPage = ({ onNavigate }) => {
       </section>
 
       <section
+        id="how"
         data-reveal="workflow"
         className={`mx-auto max-w-7xl px-6 pb-20 md:px-10 transition-all duration-700 ease-out ${revealClass('workflow')}`}
         style={{ transitionDelay: '180ms' }}
@@ -195,6 +198,15 @@ const LandingPage = ({ onNavigate }) => {
           </div>
         </div>
       </section>
+      
+      <section
+        id="pricing"
+        data-reveal="pricing"
+        className={`mx-auto max-w-7xl px-6 pb-20 md:px-10 transition-all duration-700 ease-out ${revealClass('pricing')}`}
+        style={{ transitionDelay: '200ms' }}
+      >
+        <Pricing onNavigate={onNavigate} />
+      </section>
 
       <section
         data-reveal="testimonials"
@@ -228,33 +240,6 @@ const LandingPage = ({ onNavigate }) => {
         </div>
       </section>
 
-      <footer className="border-t border-slate-200/70 bg-white/90 px-6 py-10 text-slate-700 backdrop-blur-sm md:px-10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-lg font-bold text-slate-950">Let Me Cook</p>
-            <p className="mt-3 max-w-md text-sm leading-6 text-slate-600">
-              Modern recipe discovery for every kitchen. Smart, simple, and beautiful.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
-            <button
-              onClick={() => onNavigate('signup')}
-              className="rounded-full bg-amber-100 px-4 py-2 text-amber-700 transition hover:bg-amber-200"
-            >
-              Get started
-            </button>
-            <button
-              onClick={() => onNavigate('login')}
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 transition hover:bg-slate-50"
-            >
-              Login
-            </button>
-          </div>
-        </div>
-        <div className="mt-8 border-t border-slate-200/70 pt-6 text-center text-xs uppercase tracking-[0.24em] text-slate-500">
-          © 2026 Let Me Cook. Crafted for modern chefs.
-        </div>
-      </footer>
     </div>
   );
 };

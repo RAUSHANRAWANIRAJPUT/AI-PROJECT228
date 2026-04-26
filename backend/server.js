@@ -7,15 +7,11 @@ import connectDB from './config/db.js';
 
 // Load env vars
 dotenv.config({ override: true });
-
 // Connect to database
 connectDB();
-
 const app = express();
-
 // Body parser
 app.use(express.json());
-
 // Enable CORS
 app.use(cors());
 

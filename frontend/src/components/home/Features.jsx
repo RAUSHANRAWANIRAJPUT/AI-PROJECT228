@@ -1,36 +1,72 @@
 import React from 'react';
 
-const features = [
-  { icon: '🤖', title: 'AI Recipe Generation', description: 'Instant, detailed recipes for any dish using cutting-edge language models via OpenRouter.' },
-  { icon: '💬', title: 'Interactive Chatbot', description: 'Ask follow-up questions about any recipe — get substitutions, tips, and cooking guidance.' },
-  { icon: '📚', title: 'Recipe History', description: 'All your generated recipes saved automatically. Search, filter, and revisit past dishes.' },
-  { icon: '🥗', title: 'Dietary Filters', description: 'Vegan, gluten-free, keto, or any custom dietary preference — just mention it in your prompt.' },
-  { icon: '⏱️', title: 'Time Estimates', description: 'Every recipe includes prep time, cook time, and difficulty level so you plan your meals perfectly.' },
-  { icon: '🌍', title: 'Global Cuisines', description: 'From Italian to Japanese to Indian — explore thousands of world cuisine styles and flavors.' },
-];
-
 const Features = () => {
+  const features = [
+    {
+      title: 'AI Flavor Profile',
+      description: 'Our AI understands flavor combinations, not just ingredients.',
+      icon: '👅',
+      delay: '0ms',
+    },
+    {
+      title: 'Smart Substitutions',
+      description: 'Missing an ingredient? We suggest perfect swaps instantly.',
+      icon: '🔄',
+      delay: '100ms',
+    },
+    {
+      title: 'Speed Mode',
+      description: 'Generate complete cooking instructions in under 2 seconds.',
+      icon: '🏎️',
+      delay: '200ms',
+    },
+    {
+      title: 'Dietary Guard',
+      description: 'Strict adherence to your allergies and dietary preferences.',
+      icon: '🛡️',
+      delay: '300ms',
+    },
+    {
+      title: 'Visual Plating',
+      description: 'AI-generated descriptions of how to plate your dish beautifully.',
+      icon: '🍽️',
+      delay: '400ms',
+    },
+    {
+      title: 'Global Cuisine',
+      description: 'Master recipes from over 50 different culinary traditions.',
+      icon: '🌎',
+      delay: '500ms',
+    },
+  ];
+
   return (
-    <section id="features" className="py-24 px-6 md:px-12 bg-[#F5F0E8]">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-12">
-          <span className="text-gold text-xs font-semibold uppercase tracking-widest mb-3 block">Features</span>
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-dark max-w-xl leading-tight">Everything a home chef needs</h2>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feat, idx) => (
-            <div key={idx} className="bg-card border border-border rounded-[20px] p-8 hover:-translate-y-1 transition-transform duration-300">
-              <div className="w-12 h-12 rounded-xl bg-dark flex items-center justify-center text-xl mb-6">
-                {feat.icon}
-              </div>
-              <h3 className="text-lg font-medium text-dark mb-2">{feat.title}</h3>
-              <p className="text-muted text-sm leading-relaxed">{feat.description}</p>
-            </div>
-          ))}
+    <div className="py-20">
+      <div className="mb-16 grid gap-8 md:grid-cols-2 md:items-end">
+        <div>
+          <h2 className="text-3xl font-black text-slate-950 sm:text-5xl">Engineered for taste</h2>
+          <p className="mt-6 max-w-lg text-lg text-slate-600">
+            We've built the world's most advanced culinary AI to ensure every meal is a masterpiece.
+          </p>
         </div>
       </div>
-    </section>
+
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {features.map((feature) => (
+          <div
+            key={feature.title}
+            className="group rounded-[2.5rem] border border-white/50 bg-white/40 p-8 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-amber-200 hover:bg-white hover:shadow-xl"
+            style={{ transitionDelay: feature.delay }}
+          >
+            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-3xl bg-white text-2xl shadow-sm transition-transform duration-300 group-hover:scale-110">
+              {feature.icon}
+            </div>
+            <h3 className="text-xl font-bold text-slate-900">{feature.title}</h3>
+            <p className="mt-3 text-sm leading-7 text-slate-600">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
